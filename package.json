@@ -45,7 +45,8 @@
     "pug": "^2.0.4",
     "rollup": "^1.27.0",
     "rollup-plugin-babel": "^4.3.3",
-    "rollup-plugin-cpy": "^2.0.1"
+    "rollup-plugin-cpy": "^2.0.1",
+    "uglify-js": "^3.18.0"
   },
   "dependencies": {
     "crypto-js": "^4.2.0",
@@ -57,7 +58,7 @@
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "rollup -c && npm run build-standalone",
-    "build-standalone": "browserify --standalone PDFDocument --ignore crypto --ignore iconv-lite js/pdfkit.js > js/pdfkit.standalone.js",
+    "build-standalone": "browserify --standalone PDFDocument --ignore crypto --ignore iconv-lite js/pdfkit.js | npx uglifyjs -cm > js/pdfkit.standalone.js",
     "browserify-example": "browserify examples/browserify/browser.js > examples/browserify/bundle.js",
     "pdf-guide": "node docs/generate.js",
     "website": "node docs/generate_website.js",
