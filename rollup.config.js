@@ -49,7 +49,7 @@ export default [
         ]
       }),
       copy({
-        files: ['lib/font/data/*.afm', 'lib/mixins/data/*.icc'],
+        files: ['lib/font/data/*.afm', 'lib/font/data/*.ttf', 'lib/mixins/data/*.icc'],
         dest: 'js/data'
       })
     ]
