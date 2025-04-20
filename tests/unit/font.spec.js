@@ -7,7 +7,7 @@ describe('EmbeddedFont', () => {
     const document = new PDFDocument();
     const font = PDFFontFactory.open(
       document,
-      'tests/fonts/Roboto-Regular.ttf'
+      'tests/fonts/Roboto-Regular.ttf',
     );
     const runSpy = jest.spyOn(font, 'layoutRun');
 
@@ -23,7 +23,7 @@ describe('EmbeddedFont', () => {
     const document = new PDFDocument({ fontLayoutCache: false });
     const font = PDFFontFactory.open(
       document,
-      'tests/fonts/Roboto-Regular.ttf'
+      'tests/fonts/Roboto-Regular.ttf',
     );
     const runSpy = jest.spyOn(font, 'layoutRun');
 
@@ -42,7 +42,7 @@ describe('EmbeddedFont', () => {
         document,
         'tests/fonts/Roboto-Regular.ttf',
         undefined,
-        'F1099'
+        'F1099',
       );
       const dictionary = {
         end: () => {},
@@ -54,14 +54,14 @@ describe('EmbeddedFont', () => {
     });
   });
 
-  describe.only('toUnicodeMap', () => {
+  describe('toUnicodeMap', () => {
     test('bfrange lines should not cross highcode boundary', () => {
       const doc = new PDFDocument({ compress: false });
       const font = PDFFontFactory.open(
         doc,
         'tests/fonts/Roboto-Regular.ttf',
         undefined,
-        'F1099'
+        'F1099',
       );
 
       // 398 different glyphs
@@ -80,19 +80,64 @@ describe('EmbeddedFont', () => {
 
       const docData = logData(doc);
       font.toUnicodeCmap();
-      const text = docData.map((d) => d.toString("utf8")).join("");
+      const text = docData.map((d) => d.toString('utf8')).join('');
 
-      let glyphs = 0
-      for (const block of text.matchAll(/beginbfrange\n((?:.|\n)*?)\nendbfrange/g)) {
-        for (const line of block[1].matchAll(/^<([0-9a-f]+)>\s+<([0-9a-f]+)>\s+\[/igm)) {
+      let glyphs = 0;
+      for (const block of text.matchAll(
+        /beginbfrange\n((?:.|\n)*?)\nendbfrange/g,
+      )) {
+        for (const line of block[1].matchAll(
+          /^<([0-9a-f]+)>\s+<([0-9a-f]+)>\s+\[/gim,
+        )) {
           const low = parseInt(line[1], 16);
           const high = parseInt(line[2], 16);
           glyphs += high - low + 1;
-          expect(high & 0xFFFFFF00).toBe(low & 0xFFFFFF00);
+          expect(high & 0xffffff00).toBe(low & 0xffffff00);
         }
       }
 
       expect(glyphs).toBe(398 + 1);
     });
+  });
+});
+
+describe('sizeToPoint', () => {
+  let doc;
+  beforeEach(() => {
+    doc = new PDFDocument({
+      font: 'Helvetica',
+      fontSize: 12,
+      size: [250, 500],
+      margin: { top: 10, right: 5, bottom: 10, left: 5 },
+    });
+  });
+
+  test.each([
+    [1, 1],
+    ['1', 1],
+    [true, 1],
+    [false, 0],
+    ['1em', 12],
+    ['1in', 72],
+    ['1px', 0.75],
+    ['1cm', 28.3465],
+    ['1mm', 2.8346],
+    ['1pc', 12],
+    ['1ex', 11.1],
+    ['1ch', 6.672],
+    ['1vw', 2.5],
+    ['1vh', 5],
+    ['1vmin', 2.5],
+    ['1vmax', 5],
+    ['1%', 0.12],
+    ['1pt', 1],
+  ])('%o -> %s', (size, expected) => {
+    expect(doc.sizeToPoint(size)).toBeCloseTo(expected, 4);
+  });
+
+  test('1rem -> 12', () => {
+    doc.fontSize(15);
+    expect(doc.sizeToPoint('1em')).toEqual(15);
+    expect(doc.sizeToPoint('1rem')).toEqual(12);
   });
 });

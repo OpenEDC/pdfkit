@@ -1,6 +1,6 @@
 import pkg from './package.json';
-import babel from 'rollup-plugin-babel';
-import copy from 'rollup-plugin-cpy';
+import { babel } from '@rollup/plugin-babel';
+import copy from 'rollup-plugin-copy';
 
 const external = [
   'stream',
@@ -35,6 +35,7 @@ export default [
     },
     plugins: [
       babel({
+        babelHelpers: 'bundled',
         babelrc: false,
         presets: [
           [
@@ -46,7 +47,8 @@ export default [
               }
             }
           ]
-        ]
+        ],
+        comments: false
       }),
       copy({
         files: ['lib/font/data/*.afm', 'lib/font/data/*.ttf', 'lib/mixins/data/*.icc'],
@@ -66,6 +68,7 @@ export default [
     },
     plugins: [
       babel({
+        babelHelpers: 'bundled',
         babelrc: false,
         presets: [
           [
@@ -77,7 +80,8 @@ export default [
               }
             }
           ]
-        ]
+        ],
+        comments: false
       })
     ]
   },
@@ -92,6 +96,7 @@ export default [
     },
     plugins: [
       babel({
+        babelHelpers: 'bundled',
         babelrc: false,
         presets: [
           [
