@@ -51,8 +51,9 @@ export default [
         comments: false
       }),
       copy({
-        files: ['lib/font/data/*.afm', 'lib/font/data/*.ttf', 'lib/mixins/data/*.icc'],
-        dest: 'js/data'
+        targets: [
+          { src: ['lib/font/data/*.afm', 'lib/font/data/*.ttf', 'lib/mixins/data/*.icc'], dest: 'js/data' },
+        ]
       })
     ]
   },
